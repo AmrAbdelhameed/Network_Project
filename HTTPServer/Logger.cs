@@ -11,7 +11,11 @@ namespace HTTPServer
         public static void LogException(Exception ex)
         {
             // TODO: Create log file named log.txt to log exception details in it
-            // for each exception write its details associated with datetime 
+            FileStream fs = new FileStream("D:\\_FCIS\\Sna 4\\Semester 1\\Network\\Sections\\HTTP\\HTTP\\project\\Template[2018-2019]\\HTTPServer\\bin\\Debug\\log.txt", FileMode.OpenOrCreate, FileAccess.Write);
+            StreamWriter sw = new StreamWriter(fs);
+            // for each exception write its details associated with datetime
+            sw.WriteLine(ex.Message, DateTime.Now);
+            sw.Close();
         }
     }
 }
