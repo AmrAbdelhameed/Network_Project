@@ -30,10 +30,13 @@ namespace HTTPServer
         List<string> headerLines = new List<string>();
         public Response(StatusCode code, string contentType, string content, string redirectoinPath)
         {
-            throw new NotImplementedException();
+            this.code = code;
             // TODO: Add headlines (Content-Type, Content-Length,Date, [location if there is redirection])
-
-
+            headerLines.Add(contentType);
+            headerLines.Add(content.Length.ToString());
+            headerLines.Add(DateTime.UtcNow.Date.ToString("dd/MM/yyyy"));
+            if (redirectoinPath.Length != 0)
+                headerLines.Add(redirectoinPath);
             // TODO: Create the request string
 
         }
@@ -42,7 +45,7 @@ namespace HTTPServer
         {
             // TODO: Create the response status line and return it
             string statusLine = string.Empty;
-
+            
             return statusLine;
         }
     }
