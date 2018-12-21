@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,7 +24,7 @@ namespace HTTPServer
         string[] requestLines; //Done
         RequestMethod method; //Done
         public string relativeURI; //Done
-        Dictionary<string, string> headerLines;
+        Dictionary<string, string> headerLines; //Done
 
         public Dictionary<string, string> HeaderLines
         {
@@ -34,7 +34,7 @@ namespace HTTPServer
         HTTPVersion httpVersion; //Done
         string requestString;   //Done  
         string[] contentLines;
-
+        string[] tempLines; // Done
         public Request(string requestString)
         {
             this.requestString = requestString;
@@ -47,10 +47,10 @@ namespace HTTPServer
         {
             //GET http://www.w3.org/pub/WWW/TheProject.html HTTP/1.1
             //TODO: parse the receivedRequest using the \r\n delimeter
-            string[] requestLines = requestString.Split(new char[] {'\r', '\n', ' '});
-
+            requestLines = requestString.Split(new char[] {'\r', '\n'});
+            tempLines = requestLines[0].Split(' ');
             // check that there is atleast 3 lines: Request line, Host Header, Blank line (usually 4 lines with the last empty line for empty content)
-            if (requestLines.Length != 4)
+            if (requestLines.Length < 3)
                 return false;
             // Parse Request line
             if (!ParseRequestLine())
@@ -66,32 +66,32 @@ namespace HTTPServer
 
         private bool ParseRequestLine()
         {
-            if (requestLines[0] == "GET")
+            if (tempLines[0] == "GET")
                 method = RequestMethod.GET;
-            else if (requestLines[0] == "POST")
+            else if (tempLines[0] == "POST")
                 method = RequestMethod.POST;
-            else if (requestLines[0] == "HEAD")
+            else if (tempLines[0] == "HEAD")
                 method = RequestMethod.HEAD;
             else
                 return false;
-            if (ValidateIsURI(requestLines[1]))
+            if (ValidateIsURI(tempLines[1]))
             {
                 int cnt = 0, ptr;
-                for(ptr = 0; ptr < requestLines[1].Length && cnt < 3; ptr++)
+                for(ptr = 0; ptr < tempLines[1].Length && cnt < 3; ptr++)
                 {
-                    bool f = (requestLines[1][ptr] == '/');
+                    bool f = (tempLines[1][ptr] == '/');
                     if (f)
                         cnt++;
                 }
-                relativeURI = "/" + requestLines[1].Substring(ptr);
+                relativeURI = "/" + tempLines[1].Substring(ptr);
             }
             else
                 return false;
-            if (requestLines[2] == "HTTP/1.1")
+            if (tempLines[2] == "HTTP/1.1")
                 httpVersion = HTTPVersion.HTTP11;
-            else if (requestLines[2] == "HTTP/1.0")
+            else if (tempLines[2] == "HTTP/1.0")
                 httpVersion = HTTPVersion.HTTP10;
-            else if (requestLines[2] == "HTTP/0.9")
+            else if (tempLines[2] == "HTTP/0.9")
                 httpVersion = HTTPVersion.HTTP09;
             else
                 return false;
@@ -102,23 +102,30 @@ namespace HTTPServer
         {
             return Uri.IsWellFormedUriString(uri, UriKind.RelativeOrAbsolute);
         }
-
+        private int getSeprator(string header)
+        {
+            for(int i = 0; i < header.Length; i++)
+            {
+                if (header[i] == ':')
+                    return i + 1;
+            }
+            return -1;
+        }
         private bool LoadHeaderLines()
         {
-            string type = relativeURI.Split('.')[relativeURI.Split('.').Length - 1];
-            if (type == "html" || type == "text")
+            for(int i = 1; i < requestLines.Length - 1; i++)
             {
-                headerLines["Content-Type"] = type;
+                int x = getSeprator(requestLines[i]);
+                if (x == -1)
+                    return false;
+                headerLines[requestLines[i].Substring(0, x)] = requestLines[i].Substring(x);
             }
-            else
-                return false;
-            headerLines["Date"] = DateTime.UtcNow.Date.ToString("dd/MM/yyyy");
             return true;
         }
 
         private bool ValidateBlankLine()
         {
-            if (requestLines[3] != "")
+            if (requestLines[requestLines.Length - 1] != "")
                 return false;
             return true;
         }
