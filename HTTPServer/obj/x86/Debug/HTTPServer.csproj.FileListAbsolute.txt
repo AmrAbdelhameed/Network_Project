@@ -2,3 +2,8 @@ C:\Users\dell\Desktop\Template\HTTPServer\bin\Debug\HTTPServer.exe
 C:\Users\dell\Desktop\Template\HTTPServer\bin\Debug\HTTPServer.pdb
 C:\Users\dell\Desktop\Template\HTTPServer\obj\x86\Debug\HTTPServer.exe
 C:\Users\dell\Desktop\Template\HTTPServer\obj\x86\Debug\HTTPServer.pdb
+D:\_FCIS\Sna 4\Semester 1\Network\Sections\Network_Project\HTTPServer\bin\Debug\HTTPServer.exe
+D:\_FCIS\Sna 4\Semester 1\Network\Sections\Network_Project\HTTPServer\bin\Debug\HTTPServer.pdb
+D:\_FCIS\Sna 4\Semester 1\Network\Sections\Network_Project\HTTPServer\obj\x86\Debug\HTTPServer.csprojResolveAssemblyReference.cache
+D:\_FCIS\Sna 4\Semester 1\Network\Sections\Network_Project\HTTPServer\obj\x86\Debug\HTTPServer.exe
+D:\_FCIS\Sna 4\Semester 1\Network\Sections\Network_Project\HTTPServer\obj\x86\Debug\HTTPServer.pdb

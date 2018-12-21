@@ -31,7 +31,7 @@ namespace HTTPServer
             sw.WriteLine("aboutus.html,aboutus2.html");
             sw.WriteLine("aboutus2.html,aboutus2.html");
             sw.WriteLine("BadRequest.html,NotFound.html");
-            sw.WriteLine("main.html,Redirect.html");
+            //sw.WriteLine("main.html,Redirect.html");
             sw.Close();
         }
     }

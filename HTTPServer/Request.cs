@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,20 +21,20 @@ namespace HTTPServer
 
     class Request
     {
-        string[] requestLines; //Done
-        RequestMethod method; //Done
-        public string relativeURI; //Done
-        Dictionary<string, string> headerLines; //Done
+        string[] requestLines;
+        RequestMethod method;
+        public string relativeURI;
+        Dictionary<string, string> headerLines;
 
         public Dictionary<string, string> HeaderLines
         {
             get { return headerLines; }
         }
 
-        HTTPVersion httpVersion; //Done
-        string requestString;   //Done  
+        HTTPVersion httpVersion;
+        string requestString;
         string[] contentLines;
-        string[] tempLines; // Done
+        string[] tempLines;
         public Request(string requestString)
         {
             this.requestString = requestString;
@@ -47,7 +47,7 @@ namespace HTTPServer
         {
             //GET http://www.w3.org/pub/WWW/TheProject.html HTTP/1.1
             //TODO: parse the receivedRequest using the \r\n delimeter
-            requestLines = requestString.Split(new char[] {'\r', '\n'});
+            requestLines = requestString.Split(new char[] { '\r', '\n' });
             tempLines = requestLines[0].Split(' ');
             // check that there is atleast 3 lines: Request line, Host Header, Blank line (usually 4 lines with the last empty line for empty content)
             if (requestLines.Length < 3)
@@ -77,7 +77,7 @@ namespace HTTPServer
             if (ValidateIsURI(tempLines[1]))
             {
                 int cnt = 0, ptr;
-                for(ptr = 0; ptr < tempLines[1].Length && cnt < 3; ptr++)
+                for (ptr = 0; ptr < tempLines[1].Length && cnt < 3; ptr++)
                 {
                     bool f = (tempLines[1][ptr] == '/');
                     if (f)
@@ -104,7 +104,7 @@ namespace HTTPServer
         }
         private int getSeprator(string header)
         {
-            for(int i = 0; i < header.Length; i++)
+            for (int i = 0; i < header.Length; i++)
             {
                 if (header[i] == ':')
                     return i + 1;
@@ -113,7 +113,7 @@ namespace HTTPServer
         }
         private bool LoadHeaderLines()
         {
-            for(int i = 1; i < requestLines.Length - 1; i++)
+            for (int i = 1; i < requestLines.Length - 1; i++)
             {
                 int x = getSeprator(requestLines[i]);
                 if (x == -1)
@@ -129,6 +129,5 @@ namespace HTTPServer
                 return false;
             return true;
         }
-
     }
 }
