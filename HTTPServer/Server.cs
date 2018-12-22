@@ -11,14 +11,14 @@ namespace HTTPServer
 {
     class Server
     {
-        Socket serverSocket;
+        Socket serverSocket, tmpSocket;
 
         public Server(int portNumber, string redirectionMatrixPath)
         {
             //TODO: call this.LoadRedirectionRules passing redirectionMatrixPath to it
-            this.LoadRedirectionRules(redirectionMatrixPath);
+            LoadRedirectionRules(redirectionMatrixPath);
             //TODO: initialize this.serverSocket
-            this.serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             IPEndPoint hostEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), portNumber);
             serverSocket.Bind(hostEndPoint);
         }
@@ -28,10 +28,10 @@ namespace HTTPServer
             // TODO: Listen to connections, with large backlog.
             serverSocket.Listen(1000);
             // TODO: Accept connections in while loop and start a thread for each connection on function "Handle Connection"
-            Socket clientSock = serverSocket.Accept();
             while (true)
             {
                 //TODO: accept connections and start thread for each accepted connection.
+                Socket clientSock = serverSocket.Accept();
                 Thread thread = new Thread(new ParameterizedThreadStart(HandleConnection));
                 thread.Start(clientSock);
             }
@@ -40,7 +40,7 @@ namespace HTTPServer
         public void HandleConnection(object obj)
         {
             // TODO: Create client socket
-            Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            Socket clientSocket = (Socket)obj;
             // set client socket ReceiveTimeout = 0 to indicate an infinite time-out period
             clientSocket.ReceiveTimeout = 0;
             // TODO: receive requests in while true until remote client closes the socket.
@@ -91,12 +91,16 @@ namespace HTTPServer
                 string relativePath = Path.GetFileName(request.relativeURI);
                 string redirectedPath = GetRedirectionPagePathIFExist(relativePath);
                 if (redirectedPath != string.Empty)
-                    physicalPath = redirectedPath;
+                {
+                    string physicalRedirectedPath = Path.Combine(Configuration.RootPath, redirectedPath);
+                    content = LoadDefaultPage(physicalRedirectedPath);
+                    return new Response(StatusCode.Redirect, "text/html", content, redirectedPath);
+                }
                 //TODO: check file exists
                 if (!File.Exists(physicalPath))
                 {
-                    content = LoadDefaultPage(Configuration.BadRequestDefaultPageName);
-                    return new Response(StatusCode.BadRequest, "text/html", content, "");
+                    content = LoadDefaultPage(Configuration.NotFoundDefaultPageName);
+                    return new Response(StatusCode.NotFound, "text/html", content, "");
                 }
                 //TODO: read the physical file
                 else
@@ -119,7 +123,7 @@ namespace HTTPServer
         private string GetRedirectionPagePathIFExist(string relativePath)
         {
             // using Configuration.RedirectionRules return the redirected page path if exists else returns empty
-            if (!Configuration.RedirectionRules.ContainsKey(relativePath))
+            if (Configuration.RedirectionRules.ContainsKey(relativePath))
                 return Configuration.RedirectionRules[relativePath];
             return string.Empty;
         }
@@ -149,6 +153,7 @@ namespace HTTPServer
                 StreamReader sr = new StreamReader(fs);
                 string fileContent = "";
                 // then fill Configuration.RedirectionRules dictionary
+                Configuration.RedirectionRules = new Dictionary<string, string>();
                 while ((fileContent = sr.ReadLine()) != null)
                 {
                     string[] splitedFile = fileContent.Split(',');

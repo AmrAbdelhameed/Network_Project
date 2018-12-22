@@ -38,6 +38,7 @@ namespace HTTPServer
         public Request(string requestString)
         {
             this.requestString = requestString;
+            headerLines = new Dictionary<string, string>();
         }
         /// <summary>
         /// Parses the request string and loads the request line, header lines and content, returns false if there is a parsing error
@@ -50,9 +51,9 @@ namespace HTTPServer
             requestLines = requestString.Split(new char[] { '\r', '\n' });
             tempLines = requestLines[0].Split(' ');
             // check that there is atleast 3 lines: Request line, Host Header, Blank line (usually 4 lines with the last empty line for empty content)
-            if (requestLines.Length < 3)
+            if (requestLines.Length < 3 || tempLines.Length != 3)
                 return false;
-            // Parse Request line
+            // Parse Request lines
             if (!ParseRequestLine())
                 return false;
             // Validate blank line exists
@@ -76,14 +77,18 @@ namespace HTTPServer
                 return false;
             if (ValidateIsURI(tempLines[1]))
             {
-                int cnt = 0, ptr;
-                for (ptr = 0; ptr < tempLines[1].Length && cnt < 3; ptr++)
+                int seprator = tempLines[1].Length;
+                for (int i = 0; i < tempLines[1].Length; i++)
                 {
-                    bool f = (tempLines[1][ptr] == '/');
-                    if (f)
-                        cnt++;
+                    char nxt = new char();
+                    if(i + 1 != tempLines[1].Length)
+                        nxt = tempLines[1][i+1];
+                    if(tempLines[1][i] == '/' && nxt != '/'){
+                        seprator = i + 1;
+                        break;
+                    }
                 }
-                relativeURI = "/" + tempLines[1].Substring(ptr);
+                relativeURI = tempLines[1].Substring(seprator);
             }
             else
                 return false;
@@ -115,18 +120,24 @@ namespace HTTPServer
         {
             for (int i = 1; i < requestLines.Length - 1; i++)
             {
+                if (requestLines[i].Length == 0) continue;
                 int x = getSeprator(requestLines[i]);
                 if (x == -1)
                     return false;
-                headerLines[requestLines[i].Substring(0, x)] = requestLines[i].Substring(x);
+                headerLines.Add(requestLines[i].Substring(0, x),requestLines[i].Substring(x));
             }
             return true;
         }
 
         private bool ValidateBlankLine()
         {
-            if (requestLines[requestLines.Length - 1] != "")
-                return false;
+            foreach (char c in requestLines[requestLines.Length - 1])
+            {
+                if (c != ' ' && c != '\n' && c != '\r' && c != 0)
+                {
+                    return false;
+                }
+            }
             return true;
         }
     }

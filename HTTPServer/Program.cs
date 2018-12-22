@@ -15,7 +15,7 @@ namespace HTTPServer
             //Start server
             // 1) Make server object on port 1000
             // 2) Start Server
-            string redirectionRulesPath = "D:\\_FCIS\\Sna 4\\Semester 1\\Network\\Sections\\HTTP\\HTTP\\project\\Template[2018-2019]\\HTTPServer\\redirectionRules.txt";
+            string redirectionRulesPath = "D:\\_FCIS\\Sna 4\\Semester 1\\Network\\Sections\\Network_Project\\HTTPServer\\bin\\Debug\\redirectionRules.txt";
             Server s = new Server(1000, redirectionRulesPath);
             s.StartServer();
         }
@@ -31,7 +31,6 @@ namespace HTTPServer
             sw.WriteLine("aboutus.html,aboutus2.html");
             sw.WriteLine("aboutus2.html,aboutus2.html");
             sw.WriteLine("BadRequest.html,NotFound.html");
-            //sw.WriteLine("main.html,Redirect.html");
             sw.Close();
         }
     }
